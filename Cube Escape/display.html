@@ -25,6 +25,31 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
+        // Define the tileset
+        const tileset = new Image();
+tileset.onload = function() {
+  const mapHeight = 5;
+  const mapWidth = 5;
+  const tileSize = 64;
+  // assign the tile numbers based on the tile image filename
+  const tilesetMapping = {
+    "0.png": 1,
+    // add more mappings as needed
+  };
+  
+  // Start the game loop
+  loop();
+};
+tileset.src = "grass1/0.png";
+const map = [
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+];
+
+
         // Define the cube
         let cube = {
             x: 275,
@@ -108,17 +133,33 @@
 
         // Draw the cube and the camera view
         function draw() {
-            // Clear the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Clear the canvas
+  const mapHeight = 5;
+  const mapWidth = 5;
+  const tileSize = 64;
+  const tilesetMapping = {
+    "0.png": 1,
+    // add more mappings as needed
+  };
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Draw the cube in the camera view
-            ctx.fillRect(cube.x - camera.x, cube.y - camera.y, cube.size, cube.size);
+  // Draw the tiles in the camera view
+  for (let y = 0; y < mapHeight; y++) {
+    for (let x = 0; x < mapWidth; x++) {
+      const tileIndex = map[y][x];
+      const tileNumber = tilesetMapping[tileIndex + ".png"];
+      console.log(tileIndex, tileNumber);
+      ctx.drawImage(tileset, (tileNumber - 1) * tileSize, 0, tileSize, tileSize, x * tileSize - camera.x, y * tileSize - camera.y, tileSize, tileSize);
+    }
+  }
 
-            // Draw the camera view
-            ctx.strokeStyle = "transparent"; 
-            ctx.strokeRect(camera.x,camera.y,camera.width,camera.height
-         );
-        }   
+  // Draw the cube in the camera view
+  ctx.fillRect(cube.x - camera.x, cube.y - camera.y, cube.size, cube.size);
+
+  // Draw the camera view
+  ctx.strokeStyle = "transparent";
+  ctx.strokeRect(camera.x, camera.y, camera.width, camera.height);
+}
 
     // The game loop
     function loop() {
@@ -127,8 +168,6 @@
         requestAnimationFrame(loop);
     }
 
-    // Start the game loop
-    loop();
 
     // Add event listeners for cube movement
     window.addEventListener('keydown', moveCube);
