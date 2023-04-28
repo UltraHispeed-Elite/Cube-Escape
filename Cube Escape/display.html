@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cube Movement Example</title>
+    <style>
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #canvas {
+            border: 1px solid black;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas" width="600" height="600"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Define the cube
+        let cube = {
+            x: 275,
+            y: 275,
+            size: 50,
+            speed: 2,
+            xVelocity: 0,
+            yVelocity: 0
+        };
+
+        // Define the camera
+        let camera = {
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 600
+        }
+
+        // Move the cube
+        function moveCube(event) {
+            switch(event.keyCode) {
+                case 37: // Left arrow key
+                case 65: // A key
+                    cube.xVelocity = -cube.speed;
+                    break;
+                case 38: // Up arrow key
+                case 87: // W key
+                    cube.yVelocity = -cube.speed;
+                    break;
+                case 39: // Right arrow key
+                case 68: // D key
+                    cube.xVelocity = cube.speed;
+                    break;
+                case 40: // Down arrow key
+                case 83: // S key
+                    cube.yVelocity = cube.speed;
+                    break;
+            }
+        }
+
+        // Stop the cube
+        function stopCube(event) {
+            switch(event.keyCode) {
+                case 37: // Left arrow key
+                case 65: // A key
+                    if (cube.xVelocity < 0) {
+                        cube.xVelocity = 0;
+                    }
+                    break;
+                case 38: // Up arrow key
+                case 87: // W key
+                    if (cube.yVelocity < 0) {
+                        cube.yVelocity = 0;
+                    }
+                    break;
+                case 39: // Right arrow key
+                case 68: // D key
+                    if (cube.xVelocity > 0) {
+                        cube.xVelocity = 0;
+                    }
+                    break;
+                case 40: // Down arrow key
+                case 83: // S key
+                    if (cube.yVelocity > 0) {
+                        cube.yVelocity = 0;
+                    }
+                    break;
+            }
+        }
+
+        // Update the cube position and camera position
+        function update() {
+            // Update the cube position
+            cube.x += cube.xVelocity;
+            cube.y += cube.yVelocity;
+
+            // Update the camera position
+            camera.x = cube.x - canvas.width / 2 + cube.size / 2;
+            camera.y = cube.y - canvas.height / 2 + cube.size / 2;
+        }
+
+        // Draw the cube and the camera view
+        function draw() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the cube in the camera view
+            ctx.fillRect(cube.x - camera.x, cube.y - camera.y, cube.size, cube.size);
+
+            // Draw the camera view
+            ctx.strokeStyle = "transparent"; 
+            ctx.strokeRect(camera.x,camera.y,camera.width,camera.height
+         );
+        }   
+
+    // The game loop
+    function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    // Start the game loop
+    loop();
+
+    // Add event listeners for cube movement
+    window.addEventListener('keydown', moveCube);
+    window.addEventListener('keyup', stopCube);
+</script>
+</body>
+</html>
