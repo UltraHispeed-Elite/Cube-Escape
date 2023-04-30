@@ -61,6 +61,10 @@ const map = [
 let mouseX = 0;
 let mouseY = 0;
 let mouse = { x: 0, y: 0 };
+let cubeImage = new Image();
+cubeImage.src = "Cubert.png";
+const gunImage = new Image();
+gunImage.src = "Guns/pistol2.png";
 
         // Define the cube
         let cube = {
@@ -89,60 +93,73 @@ const gun = {
   width: 64,
   size: 28,
   bullets: [],
-  shoot(mouseX, mouseY, direction) { // add direction as parameter
-    const bulletSpeed = 0.5; // decrease the bullet speed
-    const bulletPos = new Vector(
-      this.x + Math.cos(this.angle) * this.size,
-      this.y + Math.sin(this.angle) * this.size
-    );
-    let bulletDir = new Vector(mouseX - bulletPos.x, mouseY - bulletPos.y).normalize();
+  shoot(mouseX, mouseY, direction) {
+  const bulletSpeed = 10;
+  const bulletPos = new Vector(
+    this.x + Math.cos(this.angle) * gunImage.width / 2,
+    this.y + Math.sin(this.angle) * (this.width / 2)
+  );
 
-    if (direction === "left") { // use direction parameter to flip the velocity if facing left
-      bulletDir = new Vector(-bulletDir.x, bulletDir.y);
-    }
+  let bulletDir = new Vector(mouseX - bulletPos.x, mouseY - bulletPos.y).normalize();
 
-    const bulletVel = bulletDir.multiply(bulletSpeed);
-    const bullet = new Bullet(bulletPos, bulletVel);
-    this.bullets.push(bullet);
-  },
+  if (direction === "left" && bulletDir.x > 0) {
+    bulletDir = new Vector(-bulletDir.x, bulletDir.y);
+  } else if (direction === "right" && bulletDir.x < 0) {
+    bulletDir = new Vector(-bulletDir.x, bulletDir.y);
+  }
 
+  const bulletVel = bulletDir.multiply(bulletSpeed);
+  const bullet = new Bullet(bulletPos, bulletVel);
+  this.bullets.push(bullet);
+},
   draw() {
-    // Draw the gun
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.scale(this.angle < -Math.PI / 2 || this.angle > Math.PI / 2 ? -1 : 1, 1); // Flip horizontally if facing left
-    ctx.rotate(this.angle);
-    ctx.drawImage(bulletImage, 0, -bulletImage.height / 2);
-    ctx.restore();
+  // Draw the gun
+  ctx.save();
+  ctx.translate(this.x, this.y);
+  ctx.rotate(this.angle);
+  ctx.drawImage(gunImage, -gunImage.width / 2, -gunImage.height / 2);
+  ctx.restore();
+
+  // Draw the bullet
+  for (let i = 0; i < this.bullets.length; i++) {
+    const bullet = this.bullets[i];
 
     // Draw the bullet
-    for (let i = 0; i < gun.bullets.length; i++) {
-      const bullet = gun.bullets[i];
+    const dx = bullet.vel.x;
+    const dy = bullet.vel.y;
+    const angle = Math.atan2(dy, dx);
 
-      // Remove the bullet if it goes off-screen
-      if (
-        bullet.pos.x < -bullet.radius ||
-        bullet.pos.x > canvas.width + bullet.radius ||
-        bullet.pos.y < -bullet.radius ||
-        bullet.pos.y > canvas.height + bullet.radius
-      ) {
-        gun.bullets.splice(i, 1);
-        i--;
-      } else {
-        // Draw the bullet
-        const dx = bullet.vel.x;
-        const dy = bullet.vel.y;
-        const angle = Math.atan2(dy, dx);
+    ctx.save();
+    ctx.translate(bullet.pos.x, bullet.pos.y);
+    ctx.rotate(angle);
+    ctx.drawImage(bulletImage, -bulletImage.width / 2, -bulletImage.height / 2);
+    ctx.restore();
 
-        ctx.save();
-        ctx.translate(bullet.pos.x, bullet.pos.y);
-        ctx.rotate(angle);
-        ctx.drawImage(bulletImage, -bulletImage.width / 2, -bulletImage.height / 2);
-        ctx.restore();
+    bullet.update();
+  }
+    // Update bullet position
+for (let i = 0; i < bullets.length; i++) {
+  const bullet = bullets[i];
+  bullet.x += bullet.velocityX * deltaTime / 1000;
+  bullet.y += bullet.velocityY * deltaTime / 1000;
 
-        bullet.update();
-      }
-    }
+  // Remove off-screen bullets
+  this.bullets = this.bullets.filter((bullet) => {
+    return bullet.pos.x >= 0 && bullet.pos.x <= canvas.width && bullet.pos.y >= 0 && bullet.pos.y <= canvas.height;
+  });
+  
+  // Update bullet velocity based on cube direction
+  if (bullet.direction === "left") {
+    bullet.velocityX = -bullet.speed;
+  } else if (bullet.direction === "right") {
+    bullet.velocityX = bullet.speed;
+  } else {
+    // If the cube is not moving left or right, the bullet should not move either
+    bullet.velocityX = 0;
+  }
+}
+
+
   },
 };
 
@@ -186,18 +203,8 @@ const angle = Math.atan2(mouseY - gun.y, mouseX - gun.x);
 gun.angle = angle;
 });
 
-canvas.addEventListener('mousedown', (event) => {
-const rect = canvas.getBoundingClientRect();
-const mouseX = event.clientX - rect.left;
-const mouseY = event.clientY - rect.top;
-
-if (event.button === 0) { // add condition to check if facing left
-if (gun.angle < -Math.PI / 2 || gun.angle > Math.PI / 2) {
-gun.shoot(mouseX, mouseY, "left");
-} else {
-gun.shoot(mouseX, mouseY, "right");
-}
-}
+canvas.addEventListener('click', function(event) {
+  gun.shoot(event.clientX, event.clientY, cube.direction);
 });
 
 
@@ -471,9 +478,6 @@ function update() {
   updateGunPosition();
   updateCubePosition();
   updateCubeDirection();
-
-
-
   ctx.save();
   ctx.translate(gun.x, gun.y);
   ctx.rotate(gun.angle);
@@ -484,12 +488,6 @@ function update() {
   camera.x = cube.x - canvas.width / 2 + cube.size / 2;
   camera.y = cube.y - canvas.height / 2 + cube.size / 2;
 }
-
-
-    let cubeImage = new Image();
-    cubeImage.src = "Cubert.png";
-    const gunImage = new Image();
-    gunImage.src = "Guns/pistol2.png";
 
     function draw() {
   // Clear the canvas
