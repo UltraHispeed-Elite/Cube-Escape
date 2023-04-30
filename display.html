@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cube Escape...you can't</title>
+    <style>
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #canvas {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas" width="600" height="600"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        // Define the tileset
+        const tileset = new Image();
+        tileset.onload = function() {
+        const mapHeight = 5;
+        const mapWidth = 5;
+        const tileSize = 64;
+  // assign the tile numbers based on the tile image filename
+  const tilesetMapping = {
+    "0.png": 1,
+    // add more mappings as needed
+  };
+  
+  // Start the game loop
+  loop();
+};
+tileset.src = "grass1/0.png";
+const map = [
+    /* 
+    White square = 0
+    Grass = 1
+    */
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+];
+let mouseX = 0;
+let mouseY = 0;
+let mouse = { x: 0, y: 0 };
+
+        // Define the cube
+        let cube = {
+            x: 275,
+            y: 275,
+            size: 64,
+            speed: 1,
+            xVelocity: 0,
+            yVelocity: 0
+        };
+/*
+        const gun = {
+    x: 100,
+    y: 100,
+    size: 28,
+}; */
+
+const bulletImage = new Image();
+bulletImage.src = 'Guns/small_bullet.png';
+
+// Define the gun
+const gun = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  angle: 0,
+  width: 64,
+  size: 28,
+  bullets: [],
+  shoot(mouseX, mouseY, direction) { // add direction as parameter
+    const bulletSpeed = 0.5; // decrease the bullet speed
+    const bulletPos = new Vector(
+      this.x + Math.cos(this.angle) * this.size,
+      this.y + Math.sin(this.angle) * this.size
+    );
+    let bulletDir = new Vector(mouseX - bulletPos.x, mouseY - bulletPos.y).normalize();
+
+    if (direction === "left") { // use direction parameter to flip the velocity if facing left
+      bulletDir = new Vector(-bulletDir.x, bulletDir.y);
+    }
+
+    const bulletVel = bulletDir.multiply(bulletSpeed);
+    const bullet = new Bullet(bulletPos, bulletVel);
+    this.bullets.push(bullet);
+  },
+
+  draw() {
+    // Draw the gun
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.scale(this.angle < -Math.PI / 2 || this.angle > Math.PI / 2 ? -1 : 1, 1); // Flip horizontally if facing left
+    ctx.rotate(this.angle);
+    ctx.drawImage(bulletImage, 0, -bulletImage.height / 2);
+    ctx.restore();
+
+    // Draw the bullet
+    for (let i = 0; i < gun.bullets.length; i++) {
+      const bullet = gun.bullets[i];
+
+      // Remove the bullet if it goes off-screen
+      if (
+        bullet.pos.x < -bullet.radius ||
+        bullet.pos.x > canvas.width + bullet.radius ||
+        bullet.pos.y < -bullet.radius ||
+        bullet.pos.y > canvas.height + bullet.radius
+      ) {
+        gun.bullets.splice(i, 1);
+        i--;
+      } else {
+        // Draw the bullet
+        const dx = bullet.vel.x;
+        const dy = bullet.vel.y;
+        const angle = Math.atan2(dy, dx);
+
+        ctx.save();
+        ctx.translate(bullet.pos.x, bullet.pos.y);
+        ctx.rotate(angle);
+        ctx.drawImage(bulletImage, -bulletImage.width / 2, -bulletImage.height / 2);
+        ctx.restore();
+
+        bullet.update();
+      }
+    }
+  },
+};
+
+// Define the bullet class
+class Bullet {
+  constructor(pos, vel) {
+    this.pos = pos;
+    this.vel = vel;
+    this.radius = 4;
+  }
+  update() {
+    this.pos.x += this.vel.x;
+    this.pos.y += this.vel.y;
+  }
+}
+
+// Define the vector class
+class Vector {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  normalize() {
+    const mag = Math.sqrt(this.x * this.x + this.y * this.y);
+    return new Vector(this.x / mag, this.y / mag);
+  }
+
+  multiply(scalar) {
+    return new Vector(this.x * scalar, this.y * scalar);
+  }
+}
+
+// Handle mouse events
+canvas.addEventListener('mousemove', (event) => {
+  const rect = canvas.getBoundingClientRect();
+  
+const mouseX = event.clientX - rect.left;
+const mouseY = event.clientY - rect.top;
+const angle = Math.atan2(mouseY - gun.y, mouseX - gun.x);
+gun.angle = angle;
+});
+
+canvas.addEventListener('mousedown', (event) => {
+const rect = canvas.getBoundingClientRect();
+const mouseX = event.clientX - rect.left;
+const mouseY = event.clientY - rect.top;
+
+if (event.button === 0) { // add condition to check if facing left
+if (gun.angle < -Math.PI / 2 || gun.angle > Math.PI / 2) {
+gun.shoot(mouseX, mouseY, "left");
+} else {
+gun.shoot(mouseX, mouseY, "right");
+}
+}
+});
+
+
+        // Track the state of the mouse button
+        let mouseIsPressed = false;
+        canvas.addEventListener("mousedown", () => {
+        mouseIsPressed = true;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+        mouseIsPressed = false;
+        });
+
+        // Define the camera
+        let camera = {
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 600
+        }
+
+        function moveCube(event) {
+  switch (event.keyCode) {
+    case 37: // Left arrow key
+    case 65: // A key
+      cube.xVelocity = -cube.speed;
+      break;
+    case 38: // Up arrow key
+    case 87: // W key
+      cube.yVelocity = -cube.speed;
+      break;
+    case 39: // Right arrow key
+    case 68: // D key
+      cube.xVelocity = cube.speed;
+      break;
+    case 40: // Down arrow key
+    case 83: // S key
+      cube.yVelocity = cube.speed;
+      break;
+  } }
+
+function stopCube(event) {
+  switch (event.keyCode) {
+    case 37: // Left arrow key
+    case 65: // A key
+      if (cube.xVelocity < 0) {
+        cube.xVelocity = 0;
+      }
+      break;
+    case 38: // Up arrow key
+    case 87: // W key
+      if (cube.yVelocity < 0) {
+        cube.yVelocity = 0;
+      }
+      break;
+    case 39: // Right arrow key
+    case 68: // D key
+      if (cube.xVelocity > 0) {
+        cube.xVelocity = 0;
+      }
+      break;
+    case 40: // Down arrow key
+    case 83: // S key
+      if (cube.yVelocity > 0) {
+        cube.yVelocity = 0;
+      }
+      break;
+  }
+} 
+
+// Draw the gun and bullets
+function drawGun() {
+  ctx.save();
+  ctx.translate(cube.x + cube.size / 2, cube.y + cube.size / 2);
+
+  if (cube.direction === "left") {
+    ctx.scale(-1, 1); // flip horizontally
+  }
+
+  ctx.rotate(gun.angle);
+  ctx.drawImage(gunImage, -gun.size / 2, -gun.size / 2, gun.size, gun.size);
+
+
+  ctx.restore();
+}
+
+function updateGunPosition(event) {
+    if (!event) {
+    return;
+  }
+    const cube = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  size: 50,
+  direction: "right",
+  rotation: { x: 0, y: 0, z: 0 }
+};
+
+  var rect = canvas.getBoundingClientRect();
+  var x = event.clientX - rect.left;
+  var y = event.clientY - rect.top;
+
+  gun.x = x;
+  gun.y = y;
+
+  // Set the cube's rotation based on the position of the cursor
+  if (x < canvas.width / 2) {
+    cube.rotation.y = Math.PI;
+  } else {
+    cube.rotation.y = 0;
+  }
+
+  const gunOffsetX = canvas.width * 0.03;
+  const gunOffsetY = 0;
+
+  if (mouseX < cube.x + cube.size / 2) {
+    cube.direction = "left";
+  } else {
+    cube.direction = "right";
+  }
+
+  const dx = mouseX - (cube.x + cube.size / 2);
+  const dy = mouseY - (cube.y + cube.size / 2);
+  let angle = Math.atan2(dy, dx);
+
+  if (cube.direction === "left") {
+    angle = Math.PI - angle; // adjust angle for left-facing cube
+  }
+
+  let gunAngle = angle;
+
+  gun.angle = gunAngle;
+
+  // Adjust gunOffsetX for left-facing cube
+  let adjustedGunOffsetX = (cube.direction === "left") ? -gunOffsetX : gunOffsetX;
+
+  // Update gun position
+  const gunX = cube.x + cube.size / 2 + adjustedGunOffsetX * Math.cos(angle) - gunOffsetY * Math.sin(angle);
+  const gunY = cube.y + cube.size / 2 + adjustedGunOffsetX * Math.sin(angle) + gunOffsetY * Math.cos(angle);
+
+  gun.x = gunX;
+  gun.y = gunY;
+  gun.centerX = gunX + gun.width / 2;
+  gun.centerY = gunY + gun.height / 2;
+
+  // Flip gun horizontally when facing left
+  gun.scaleX = (cube.direction === "left") ? -1 : 1;
+  
+}
+
+function updateGunAngle(event) {
+  // Get mouse position relative to canvas
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  // Adjust mouse position based on cube and gun position
+  const cubeCenterX = cube.x + cube.size / 2;
+  const cubeCenterY = cube.y + cube.size / 2;
+  const gunOffsetX = canvas.width * 0.03;
+  const gunOffsetY = 0;
+  const gunX = cube.direction === "left" ? gunOffsetX : -gunOffsetX;
+  const gunY = 0;
+
+  const mouseXAdjusted = mouseX - cubeCenterX - gunX;
+  const mouseYAdjusted = mouseY - cubeCenterY - gunY;
+
+  // Calculate angle between gun and mouse
+  let angle;
+  if (mouseXAdjusted === 0) {
+    // Mouse is directly above or below the cube
+    angle = mouseYAdjusted > 0 ? Math.PI / 2 : -Math.PI / 2;
+  } else {
+    angle = Math.atan2(mouseYAdjusted, mouseXAdjusted);
+  }
+
+  // Adjust angle based on cube direction
+  if (cube.direction === "left") {
+    angle = Math.PI - angle;
+  }
+
+  gun.angle += angleChangeFactor * angle;
+}
+
+
+document.addEventListener("mousemove", function (event) {
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+});
+
+
+function updateCubePosition(event) {
+  if (!event) {
+    return;
+  }
+
+  // Get mouse position relative to canvas
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  // Calculate distance and angle between cursor and cube center
+  const cubeCenterX = cube.x + cube.size / 2;
+  const cubeCenterY = cube.y + cube.size / 2;
+  const dx = mouseX - cubeCenterX;
+  const dy = mouseY - cubeCenterY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+  const angle = Math.atan2(dy, dx);
+
+  // Update cube direction based on cursor position
+  const threshold = canvas.width / 2;
+  if (dx < -threshold) {
+    cube.direction = "left";
+  } else if (dx > threshold) {
+    cube.direction = "right";
+  } else {
+    cube.direction = null;
+  }
+
+  // Update cube position
+  if (cube.direction === "right") {
+    cube.x += speed;
+  } else if (cube.direction === "left") {
+    cube.x -= speed;
+  }
+
+  const speed = cube.speed * deltaTime / 1000;
+
+  // Calculate new position of the cube
+  let newX = cube.x + cube.velocityX * speed;
+  let newY = cube.y + cube.velocityY * speed;
+
+  // Check if the new position is within the map boundaries
+  if (newX < 0) {
+    newX = 0;
+  } else if (newX + cube.size > map.width) {
+    newX = map.width - cube.size;
+  }
+
+  if (newY < 0) {
+    newY = 0;
+  } else if (newY + cube.size > map.height) {
+    newY = map.height - cube.size;
+  }
+
+  // Update the cube position
+  cube.x = newX;
+  cube.y = newY;
+}
+
+function updateCubeDirection() {
+  // Get the horizontal center of the cube
+  const cubeCenterX = cube.x + cube.size / 2;
+
+  // Check if the mouse is to the left or right of the cube center
+  if (mouseX < cubeCenterX - cube.size / 4) {
+    cube.direction = "left";
+  } else if (mouseX > cubeCenterX + cube.size / 4) {
+    cube.direction = "right";
+  } else {
+    cube.direction = null;
+  }
+}
+
+function update() {
+  // Update the cube position
+  cube.x += cube.xVelocity;
+  cube.y += cube.yVelocity;
+
+  // Update the gun position and shoot bullets if spacebar is pressed
+  updateGunPosition();
+  updateCubePosition();
+  updateCubeDirection();
+
+
+
+  ctx.save();
+  ctx.translate(gun.x, gun.y);
+  ctx.rotate(gun.angle);
+  ctx.drawImage(gunImage, -gun.width / 2, -gun.height / 2, gun.width, gun.height);
+  ctx.restore();
+
+  // Update the camera position
+  camera.x = cube.x - canvas.width / 2 + cube.size / 2;
+  camera.y = cube.y - canvas.height / 2 + cube.size / 2;
+}
+
+
+    let cubeImage = new Image();
+    cubeImage.src = "Cubert.png";
+    const gunImage = new Image();
+    gunImage.src = "Guns/pistol2.png";
+
+    function draw() {
+  // Clear the canvas
+  const mapHeight = 10;
+  const mapWidth = 20;
+  const tileSize = 64;
+  const tilesetMapping = {
+    "0.png": 1,
+    // add more mappings as needed
+  };
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the tiles in the camera view
+  for (let y = 0; y < mapHeight; y++) {
+    for (let x = 0; x < mapWidth; x++) {
+      const tileIndex = map[y][x];
+      const tileNumber = tilesetMapping[tileIndex + ".png"];
+      ctx.drawImage(
+        tileset,
+        (tileNumber - 1) * tileSize,
+        0,
+        tileSize,
+        tileSize,
+        x * tileSize - camera.x,
+        y * tileSize - camera.y,
+        tileSize,
+        tileSize
+      );
+    }
+  }
+
+  // Draw the cube in the camera view
+  ctx.save();
+  ctx.translate(cube.x + cube.size / 2, cube.y + cube.size / 2);
+  if (cube.direction === "left") {
+    ctx.scale(-1, 1); // flip horizontally
+  }
+  ctx.drawImage(cubeImage, -cube.size / 2, -cube.size / 2, cube.size, cube.size);
+  ctx.restore();
+
+    // Draw the gun
+    drawGun();
+
+    for (const bullet of gun.bullets) {
+    bullet.update();
+    ctx.drawImage(bulletImage, bullet.pos.x - bullet.radius, bullet.pos.y - bullet.radius);
+  }
+
+  // Draw the gun in the camera view
+  ctx.save();
+  ctx.translate(gun.x, gun.y);
+  ctx.rotate(gun.angle);
+  ctx.drawImage(gunImage, -gun.width / 2, -gun.height / 2, gun.width, gun.height);
+  ctx.restore();
+
+  // Draw the camera view
+  ctx.strokeStyle = "transparent";
+  ctx.strokeRect(camera.x, camera.y, camera.width, camera.height);
+}
+
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  console.log("Canvas size: " + canvas.width + "x" + canvas.height);
+}
+
+// Call the function initially to set the canvas size
+resizeCanvas();
+
+// Add event listener for window resize and call resizeCanvas function
+window.addEventListener('resize', resizeCanvas);
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+    document.addEventListener('keydown', moveCube);
+    document.addEventListener('keyup', stopCube);
+    document.addEventListener('mousemove', updateGunPosition);
+</script>
+</body>
+</html>
