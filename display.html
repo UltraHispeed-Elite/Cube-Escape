@@ -27,36 +27,38 @@
         const canvasHeight = canvas.height;
 
         // Define the tileset
-        const tileset = new Image();
-        tileset.onload = function() {
-        const mapHeight = 5;
-        const mapWidth = 5;
+
         const tileSize = 64;
-  // assign the tile numbers based on the tile image filename
-  const tilesetMapping = {
-    "0.png": 1,
-    // add more mappings as needed
-  };
+        let tileset1 = null;
+        let tileset2 = null;
+        
+        const tileset = new Image();
+        tileset.src = "WhiteSquare.png";
+        tileset.onload = function() {
+            tileset1 = new Image();
+            tileset1.src = "0.png";
+            tileset2 = new Image();
+            tileset2.src = "SpawnPoint.png";
   
-  // Start the game loop
-  loop();
+            requestAnimationFrame(loop);
 };
-tileset.src = "grass1/0.png";
 const map = [
     /* 
-    White square = 0
+    Blank = 0
     Grass = 1
+    Spawn = 2
     */
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
 ];
 let mouseX = 0;
 let mouseY = 0;
@@ -68,8 +70,8 @@ gunImage.src = "Guns/pistol2.png";
 
         // Define the cube
         let cube = {
-            x: 275,
-            y: 275,
+            x:  452,
+            y: 387,
             size: 64,
             speed: 1,
             xVelocity: 0,
@@ -226,7 +228,7 @@ canvas.addEventListener('click', function(event) {
             height: 600
         }
 
-        function moveCube(event) {
+function moveCube(event) {
   switch (event.keyCode) {
     case 37: // Left arrow key
     case 65: // A key
@@ -244,7 +246,8 @@ canvas.addEventListener('click', function(event) {
     case 83: // S key
       cube.yVelocity = cube.speed;
       break;
-  } }
+  }
+}
 
 function stopCube(event) {
   switch (event.keyCode) {
@@ -273,7 +276,11 @@ function stopCube(event) {
       }
       break;
   }
-} 
+}
+
+
+
+
 
 // Draw the gun and bullets
 function drawGun() {
@@ -491,31 +498,53 @@ function update() {
 
     function draw() {
   // Clear the canvas
-  const mapHeight = 10;
+  const mapHeight = 11;
   const mapWidth = 20;
   const tileSize = 64;
-  const tilesetMapping = {
-    "0.png": 1,
-    // add more mappings as needed
-  };
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw the tiles in the camera view
+  // Wait for all images to load before drawing
+tileset1.onload = tileset2.onload = function() {
+    // Find spawn point tile
+    let spawnTile = null;
+    for (let y = 0; y < mapHeight; y++) {
+      for (let x = 0; x < mapWidth; x++) {
+        if (map[y][x] === 2) {
+          spawnTile = { x, y };
+          break;
+        }
+      }
+      if (spawnTile) break;
+    }
+    
+    // Set initial cube position to spawn point tile
+    cube.x = spawnTile.x * tileSize;
+    cube.y = spawnTile.y * tileSize;
+}
+
   for (let y = 0; y < mapHeight; y++) {
     for (let x = 0; x < mapWidth; x++) {
-      const tileIndex = map[y][x];
-      const tileNumber = tilesetMapping[tileIndex + ".png"];
-      ctx.drawImage(
-        tileset,
-        (tileNumber - 1) * tileSize,
-        0,
-        tileSize,
-        tileSize,
-        x * tileSize - camera.x,
-        y * tileSize - camera.y,
-        tileSize,
-        tileSize
-      );
+      const tile = map[y][x];
+      let image = null;
+      switch (tile) {
+        case 1:
+          image = tileset1;
+          break;
+        case 2:
+          image = tileset2;
+          break;
+        // add more cases as needed
+      }
+      if (image !== null) {
+        ctx.drawImage(
+          image,
+          x * tileSize - camera.x,
+          y * tileSize - camera.y,
+          tileSize,
+          tileSize
+        );
+      }
     }
   }
 
@@ -567,6 +596,9 @@ function loop() {
   draw();
   requestAnimationFrame(loop);
 }
+
+
+
     document.addEventListener('keydown', moveCube);
     document.addEventListener('keyup', stopCube);
     document.addEventListener('mousemove', updateGunPosition);
