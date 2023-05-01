@@ -1,3 +1,3 @@
 # Cube-Escape
-Game go brrr
-Work in progress
+1. Game go brrr
+2. Work in progress
