@@ -39,6 +39,34 @@
             tileset1.src = "0.png";
             tileset2 = new Image();
             tileset2.src = "SpawnPoint.png";
+            tileset3 = new Image();
+            tileset3.src = "nextLevel.png";
+            tileset4 = new Image();
+            tileset4.src = "grass-beach0/curve_in/180/0.png";
+            tileset5 = new Image();
+            tileset5.src = "grass-beach0/curve_in/90/0.png";
+            tileset6 = new Image();
+            tileset6.src = "grass-beach0/straight/0/0.png";
+            tileset7 = new Image();
+            tileset7.src = "grass-beach0/straight/90/0.png";
+            tileset8 = new Image();
+            tileset8.src = "grass-beach0/straight/180/0.png";
+            tileset9 = new Image();
+            tileset9.src = "grass-beach0/straight/270/0.png";
+            tileset10 = new Image();
+            tileset10.src = "grass-beach0/curve_in/0/0.png";
+            tileset11 = new Image();
+            tileset11.src = "grass-beach0/curve_in/270/0.png";
+            tileset12 = new Image();
+            tileset12.src = "beach0/straight/0/0.png";
+            tileset13 = new Image();
+            tileset13.src = "grass-beach0/curve_out/0/0.png";
+            tileset14 = new Image();
+            tileset14.src = "grass-beach0/curve_out/90/0.png";
+            tileset15 = new Image();
+            tileset15.src = "grass-beach0/curve_out/180/0.png";
+            tileset16 = new Image();
+            tileset16.src = "grass-beach0/curve_out/270/0.png";
   
             requestAnimationFrame(loop);
 };
@@ -47,18 +75,36 @@ const map = [
     Blank = 0
     Grass = 1
     Spawn = 2
+    End = 3
+    Corner Sand 180 = 4
+    Corner Sand 90 = 5
+    Straight Sand 0 = 6
+    Straight Sand 90 = 7
+    Straight Sand 180 = 8
+    Straight Sand 270 = 9
+    Corner Sand 0 = 10
+    Corner Sand 270 = 11
+    Sand 0 = 12
+    Curved Out Sand 0 = 13
+    Curved Out Sand 90 = 14
+    Curved Out Sand 180 = 15
+    Curved Out Sand 270 = 16
     */
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12],
+  [12, 13, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 16, 12, 12, 12, 12, 12, 13, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 16, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 9, 9, 9, 9, 9, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 7, 7, 7, 7, 7, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12, 12, 12, 12, 12, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 12],
+  [12, 14, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 15, 12, 12, 12, 12, 12, 14, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 15, 12],
+  [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12],
 ];
 let mouseX = 0;
 let mouseY = 0;
@@ -67,16 +113,17 @@ let cubeImage = new Image();
 cubeImage.src = "Cubert.png";
 const gunImage = new Image();
 gunImage.src = "Guns/pistol2.png";
-
         // Define the cube
         let cube = {
-            x:  64,
-            y: 64,
+            x:  500,
+            y: 386,
             size: 64,
-            speed: 1,
+            speed: 1.5,
             xVelocity: 0,
-            yVelocity: 0
+            yVelocity: 0,
         };
+        console.log(cube.x);
+console.log(cube.y)
 /*
         const gun = {
     x: 100,
@@ -98,9 +145,9 @@ const gun = {
   shoot(mouseX, mouseY, direction) {
   const bulletSpeed = 10;
   const bulletPos = new Vector(
-    this.x + Math.cos(this.angle) * gunImage.width / 2,
-    this.y + Math.sin(this.angle) * (this.width / 2)
-  );
+  this.x + Math.cos(this.angle) * (this.size / 2),
+  this.y + Math.sin(this.angle) * (this.size / 2)
+);
 
   let bulletDir = new Vector(mouseX - bulletPos.x, mouseY - bulletPos.y).normalize();
 
@@ -206,8 +253,12 @@ gun.angle = angle;
 });
 
 canvas.addEventListener('click', function(event) {
-  gun.shoot(event.clientX, event.clientY, cube.direction);
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  gun.shoot(mouseX, mouseY, cube.direction);
 });
+
 
 
         // Track the state of the mouse button
@@ -222,13 +273,13 @@ canvas.addEventListener('click', function(event) {
 
         // Define the camera
         let camera = {
-            x: 0,
-            y: 0,
+            x: cube.x - canvas.width / 2 + cube.size / 2,
+            y: cube.y - canvas.height / 2 + cube.size / 2,
             width: 600,
             height: 600
         }
 
-function moveCube(event) {
+        function moveCube(event) {
   switch (event.keyCode) {
     case 37: // Left arrow key
     case 65: // A key
@@ -248,6 +299,7 @@ function moveCube(event) {
       break;
   }
 }
+
 
 function stopCube(event) {
   switch (event.keyCode) {
@@ -277,9 +329,6 @@ function stopCube(event) {
       break;
   }
 }
-
-
-
 
 
 // Draw the gun and bullets
@@ -421,15 +470,14 @@ function updateCubePosition(event) {
   const distance = Math.sqrt(dx * dx + dy * dy);
   const angle = Math.atan2(dy, dx);
 
-  // Update cube direction based on cursor position
   const threshold = canvas.width / 2;
-  if (dx < -threshold) {
-    cube.direction = "left";
-  } else if (dx > threshold) {
-    cube.direction = "right";
-  } else {
-    cube.direction = null;
-  }
+if (dx < -threshold) {
+  cube.direction = "left";
+} else if (dx > threshold) {
+  cube.direction = "right";
+} else {
+  cube.direction = null;
+}
 
   // Update cube position
   if (cube.direction === "right") {
@@ -476,7 +524,12 @@ function updateCubeDirection() {
   }
 }
 
+lastValidPosition = {x: cube.x, y: cube.y};
+
 function update() {
+  const mapHeight = 11;
+  const mapWidth = 27;
+  const tileSize = 64;
   // Update the cube position
   cube.x += cube.xVelocity;
   cube.y += cube.yVelocity;
@@ -498,55 +551,85 @@ function update() {
 
     function draw() {
   // Clear the canvas
-  const mapHeight = 11;
-  const mapWidth = 20;
+  const mapHeight = 15;
+  const mapWidth = 31;
   const tileSize = 64;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Wait for all images to load before drawing
-tileset1.onload = tileset2.onload = function() {
-    // Find spawn point tile
-    let spawnTile = null;
-    for (let y = 0; y < mapHeight; y++) {
-      for (let x = 0; x < mapWidth; x++) {
-        if (map[y][x] === 2) {
-          spawnTile = { x, y };
-          break;
-        }
-      }
-      if (spawnTile) break;
-    }
-    
-    // Set initial cube position to spawn point tile
-    cube.x = spawnTile.x * tileSize;
-    cube.y = spawnTile.y * tileSize;
-}
 
-  for (let y = 0; y < mapHeight; y++) {
-    for (let x = 0; x < mapWidth; x++) {
-      const tile = map[y][x];
-      let image = null;
-      switch (tile) {
-        case 1:
-          image = tileset1;
-          break;
-        case 2:
-          image = tileset2;
-          break;
-        // add more cases as needed
-      }
-      if (image !== null) {
-        ctx.drawImage(
-          image,
-          x * tileSize - camera.x,
-          y * tileSize - camera.y,
-          tileSize,
-          tileSize
-        );
-      }
+    // Find spawn point til
+
+
+for (let y = 0; y < mapHeight; y++) {
+  for (let x = 0; x < mapWidth; x++) {
+    const tile = map[y][x];
+    let image = null;
+    switch (tile) {
+      case 1:
+        image = tileset1;
+        break;
+      case 2:
+        image = tileset2;
+        break;
+      case 3:
+        image = tileset3;
+        break;
+        case 4:
+        image = tileset4;
+        break;
+        case 5:
+        image = tileset5;
+        break;
+        case 6:
+        image = tileset6;
+        break;
+        case 7:
+        image = tileset7;
+        break;
+        case 8:
+        image = tileset8;
+        break;
+        case 9:
+        image = tileset9;
+        break;
+        case 10:
+        image = tileset10;
+        break;
+        case 11:
+        image = tileset11;
+        break;
+        case 12:
+        image = tileset12;
+        break;
+        case 13:
+        image = tileset13;
+        break;
+        case 14:
+        image = tileset14;
+        break;
+        case 15:
+        image = tileset15;
+        break;
+        case 16:
+        image = tileset16;
+        break;
+
+      // add more cases as needed
+    }
+    if (image !== null) {
+      ctx.drawImage(
+        image,
+        x * tileSize - camera.x,
+        y * tileSize - camera.y,
+        tileSize,
+        tileSize
+      );
     }
   }
+}
+
 
   // Draw the cube in the camera view
   ctx.save();
@@ -596,9 +679,6 @@ function loop() {
   draw();
   requestAnimationFrame(loop);
 }
-
-
-
     document.addEventListener('keydown', moveCube);
     document.addEventListener('keyup', stopCube);
     document.addEventListener('mousemove', updateGunPosition);
